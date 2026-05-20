@@ -41,6 +41,7 @@ const rotateIfNeeded = async (): Promise<void> => {
   try {
     size = (await fs.stat(AUDIT_LOG_PATH)).size
   } catch {
+    /* v8 ignore next 2 — file disappeared between appendFile and stat; nothing to rotate */
     return
   }
   if (size <= AUDIT_LOG_MAX_BYTES) return
@@ -59,6 +60,7 @@ const rotateIfNeeded = async (): Promise<void> => {
       await fs.rm(AUDIT_LOG_PATH, { force: true })
     }
   } catch (err) {
+    /* v8 ignore next 2 — outer rename failure is unreachable from a single-process test (every per-slot rename has its own try/catch) */
     console.error(`[audit-log] rotation failed: ${err instanceof Error ? err.message : String(err)}`)
   }
 }
@@ -77,6 +79,7 @@ export const appendAuditEvent = async (event: AuditEvent): Promise<void> => {
     }
     await rotateIfNeeded()
   } catch (err) {
+    /* v8 ignore next — fs.* always rejects with an Error, so the String(err) fallback is unreachable in practice */
     console.error(`[audit-log] failed to write: ${err instanceof Error ? err.message : String(err)}`)
   }
 }

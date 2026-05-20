@@ -43,7 +43,7 @@ You will need a Voicenotes personal access token in `MCP_VOICENOTES_EDIT_PAT` fo
 
 ### Commits
 
-This repo uses [Conventional Commits](https://www.conventionalcommits.org/) so [release-please](https://github.com/googleapis/release-please) can derive version bumps and changelog entries automatically.
+This repo uses [Conventional Commits](https://www.conventionalcommits.org/) so version bumps and `CHANGELOG.md` entries are easy to derive when releasing by hand. There is no auto-release pipeline.
 
 | Type        | What it means           | Bumps |
 | ----------- | ----------------------- | ----- |

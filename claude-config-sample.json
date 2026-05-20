@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "mcp-voicenotes-edit": {
+      "command": "node",
+      "args": ["/path/to/mcp-voicenotes-edit/dist/mcp-server/index.js"],
+      "env": {
+        "MCP_VOICENOTES_EDIT_PAT": "1234567|REPLACE_WITH_YOUR_TOKEN"
+      }
+    }
+  }
+}

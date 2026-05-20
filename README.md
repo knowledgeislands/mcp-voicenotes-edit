@@ -60,7 +60,9 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (or the
   "mcpServers": {
     "mcp-voicenotes-edit": {
       "command": "node",
-      "args": ["/absolute/path/to/mcp-voicenotes-edit/dist/mcp-server/index.js"],
+      "args": [
+        "/absolute/path/to/mcp-voicenotes-edit/dist/mcp-server/index.js"
+      ],
       "env": {
         "MCP_VOICENOTES_EDIT_PAT": "1234567|YOUR_TOKEN_SECRET_HERE"
       }
@@ -73,18 +75,20 @@ Restart Claude.
 
 ## Environment variables
 
-| Variable | Required | Default | Purpose |
-|---|---|---|---|
-| `MCP_VOICENOTES_EDIT_PAT` | yes | — | Bearer personal access token (`{id}\|{secret}`). |
-| `MCP_VOICENOTES_EDIT_BASE_URL` | no | `https://api.voicenotes.com` | API base URL. |
-| `MCP_VOICENOTES_EDIT_ACCESS_LEVEL` | no | `write` | `read` / `write` / `destructive`. `read` disables every tool — this MCP has no read-only tools. |
-| `MCP_VOICENOTES_EDIT_AUDIT_LOG` | no | `writes` | `off` / `writes` / `all`. |
-| `MCP_VOICENOTES_EDIT_AUDIT_LOG_PATH` | no | `~/.local/state/mcp-voicenotes-edit/audit.jsonl` | — |
+| Variable                                  | Required | Default                                          | Purpose                                                                                                |
+| ----------------------------------------- | -------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `MCP_VOICENOTES_EDIT_PAT`                 | yes      | —                                                | Bearer personal access token (`{id}\|{secret}`).                                                       |
+| `MCP_VOICENOTES_EDIT_BASE_URL`            | no       | `https://api.voicenotes.com`                     | API base URL.                                                                                          |
+| `MCP_VOICENOTES_EDIT_ACCESS_LEVEL`        | no       | `write`                                          | `read` / `write` / `destructive`. `read` disables every tool — this MCP has no read-only tools.        |
+| `MCP_VOICENOTES_EDIT_AUDIT_LOG`           | no       | `writes`                                         | Audit-log scope. `off` / `writes` (record only non-read tool calls) / `all` (record every invocation). |
+| `MCP_VOICENOTES_EDIT_AUDIT_LOG_PATH`      | no       | `~/.local/state/mcp-voicenotes-edit/audit.jsonl` | Path to the JSONL audit log.                                                                           |
+| `MCP_VOICENOTES_EDIT_AUDIT_LOG_MAX_BYTES` | no       | `10485760` (10 MiB)                              | Size-based rotation threshold in bytes. Set to `0` to disable rotation.                                |
+| `MCP_VOICENOTES_EDIT_AUDIT_LOG_KEEP`      | no       | `5`                                              | Number of rotated audit-log files to retain.                                                           |
 
 ## API surface used
 
-| Method | Path | Auth | Purpose |
-|---|---|---|---|
+| Method  | Path                     | Auth           | Purpose                                                 |
+| ------- | ------------------------ | -------------- | ------------------------------------------------------- |
 | `PATCH` | `/api/recordings/{uuid}` | `Bearer {pat}` | Update tags or title (any field accepted by the route). |
 
 Probed 2026-05-20. `OPTIONS /api/recordings/{uuid}` returned `Allow: GET, HEAD, PATCH, DELETE`. The `DELETE` capability is intentionally **not** wired up here — add it if you want, but the user-facing fork prompt explicitly scoped to tag/title edits.

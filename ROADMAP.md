@@ -11,7 +11,7 @@ Forward-looking plans only. Shipped features live in [README.md](./README.md); r
 
 - Batch tag operations (`voicenotes_notes_tag_add`, `..._tag_remove`) that fan out one PATCH per uuid with concurrency limits — useful for cleanup passes across many notes.
 - `voicenotes_tags_list` — enumerate the account's tag vocabulary (probably `GET /api/tags`, unverified).
-- Granular `dry_run` reporting that shows the *diff* (current tags → new tags) without applying.
+- Granular `dry_run` reporting that shows the _diff_ (current tags → new tags) without applying.
 
 ## Tooling
 

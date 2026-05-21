@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { READ_ONLY_REMOTE, STATE_TOGGLE_REMOTE } from './annotations.js'
+import { READ_ONLY_REMOTE, WRITE_IDEMPOTENT_REMOTE } from './annotations.js'
 
 const DESTRUCTIVE = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true } as const
 
@@ -19,9 +19,9 @@ describe('levelFromAnnotations / makeAccessGatedRegister (mcp-voicenotes-edit)',
     expect(levelFromAnnotations(READ_ONLY_REMOTE)).toBe('read')
   })
 
-  it('maps STATE_TOGGLE_REMOTE to write', async () => {
+  it('maps WRITE_IDEMPOTENT_REMOTE to write', async () => {
     const { levelFromAnnotations } = await import('./access-level.js')
-    expect(levelFromAnnotations(STATE_TOGGLE_REMOTE)).toBe('write')
+    expect(levelFromAnnotations(WRITE_IDEMPOTENT_REMOTE)).toBe('write')
   })
 
   it('maps destructiveHint:true to destructive', async () => {
@@ -50,7 +50,7 @@ describe('levelFromAnnotations / makeAccessGatedRegister (mcp-voicenotes-edit)',
     const { calls, stub } = makeStub()
     const gated = makeAccessGatedRegister(stub as unknown as Parameters<typeof makeAccessGatedRegister>[0])
     gated('voicenotes_note_get', { title: 't', description: 'd', annotations: READ_ONLY_REMOTE } as never, (async () => ({ content: [] })) as never)
-    gated('voicenotes_note_update_tags', { title: 't', description: 'd', annotations: STATE_TOGGLE_REMOTE } as never, (async () => ({ content: [] })) as never)
+    gated('voicenotes_note_update_tags', { title: 't', description: 'd', annotations: WRITE_IDEMPOTENT_REMOTE } as never, (async () => ({ content: [] })) as never)
     gated('voicenotes_note_delete', { title: 't', description: 'd', annotations: DESTRUCTIVE } as never, (async () => ({ content: [] })) as never)
     expect(calls).toEqual(['voicenotes_note_get', 'voicenotes_note_update_tags'])
   })
@@ -61,7 +61,7 @@ describe('levelFromAnnotations / makeAccessGatedRegister (mcp-voicenotes-edit)',
     const { calls, stub } = makeStub()
     const gated = makeAccessGatedRegister(stub as unknown as Parameters<typeof makeAccessGatedRegister>[0])
     gated('voicenotes_note_get', { title: 't', description: 'd', annotations: READ_ONLY_REMOTE } as never, (async () => ({ content: [] })) as never)
-    gated('voicenotes_note_update_tags', { title: 't', description: 'd', annotations: STATE_TOGGLE_REMOTE } as never, (async () => ({ content: [] })) as never)
+    gated('voicenotes_note_update_tags', { title: 't', description: 'd', annotations: WRITE_IDEMPOTENT_REMOTE } as never, (async () => ({ content: [] })) as never)
     expect(calls).toEqual(['voicenotes_note_get'])
   })
 
@@ -71,7 +71,7 @@ describe('levelFromAnnotations / makeAccessGatedRegister (mcp-voicenotes-edit)',
     const { calls, stub } = makeStub()
     const gated = makeAccessGatedRegister(stub as unknown as Parameters<typeof makeAccessGatedRegister>[0])
     gated('voicenotes_note_get', { title: 't', description: 'd', annotations: READ_ONLY_REMOTE } as never, (async () => ({ content: [] })) as never)
-    gated('voicenotes_note_update_tags', { title: 't', description: 'd', annotations: STATE_TOGGLE_REMOTE } as never, (async () => ({ content: [] })) as never)
+    gated('voicenotes_note_update_tags', { title: 't', description: 'd', annotations: WRITE_IDEMPOTENT_REMOTE } as never, (async () => ({ content: [] })) as never)
     gated('voicenotes_note_delete', { title: 't', description: 'd', annotations: DESTRUCTIVE } as never, (async () => ({ content: [] })) as never)
     expect(calls).toEqual(['voicenotes_note_get', 'voicenotes_note_update_tags', 'voicenotes_note_delete'])
   })

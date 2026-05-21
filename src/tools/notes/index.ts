@@ -1,6 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
-import { STATE_TOGGLE_REMOTE } from '../../utils/annotations.js'
+import { WRITE_IDEMPOTENT_REMOTE } from '../../utils/annotations.js'
 import { errMessage } from '../../utils/errors.js'
 import { errorResult, jsonResult } from '../../utils/results.js'
 import { patchRecording, summarizeRecording } from '../../voicenotes-client.js'
@@ -58,7 +58,7 @@ Errors:
   - "Voicenotes PATCH … HTTP 401" — MCP_VOICENOTES_EDIT_PAT is invalid or expired.
   - "Voicenotes PATCH … HTTP 404" — no recording with that uuid on this account.`,
       inputSchema: updateTagsInput,
-      annotations: STATE_TOGGLE_REMOTE
+      annotations: WRITE_IDEMPOTENT_REMOTE
     },
     async ({ uuid, tags }) => {
       try {
@@ -88,7 +88,7 @@ Errors:
   - "Voicenotes PATCH … HTTP 401" — MCP_VOICENOTES_EDIT_PAT is invalid or expired.
   - "Voicenotes PATCH … HTTP 404" — no recording with that uuid on this account.`,
       inputSchema: updateTitleInput,
-      annotations: STATE_TOGGLE_REMOTE
+      annotations: WRITE_IDEMPOTENT_REMOTE
     },
     async ({ uuid, title }) => {
       try {

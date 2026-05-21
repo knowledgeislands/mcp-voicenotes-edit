@@ -15,4 +15,4 @@ Forward-looking plans only. Shipped features live in [README.md](./README.md); r
 
 ## Tooling
 
-- Vitest test coverage for `config.ts` env parsing, `voicenotes-client.ts` error translation, and `tools/notes` schema validation — current repo ships without tests.
+- Schema validation tests for `tools/notes` (zod input schemas). Test suites for `config.ts` env parsing and `voicenotes-client.ts` error translation have shipped (see [src/config.test.ts](./src/config.test.ts), [src/voicenotes-client.test.ts](./src/voicenotes-client.test.ts)).

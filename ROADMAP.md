@@ -15,4 +15,4 @@ Forward-looking plans only. Shipped features live in [README.md](./README.md); r
 
 ## Tooling
 
-- Schema validation tests for `tools/notes` (zod input schemas). Test suites for `config.ts` env parsing and `voicenotes-client.ts` error translation have shipped (see [src/config.test.ts](./src/config.test.ts), [src/voicenotes-client.test.ts](./src/voicenotes-client.test.ts)).
+- Schema validation tests for `tools/notes` (zod input schemas). Test suites for config env parsing and Voicenotes-client error translation have shipped (see [src/config/index.test.ts](./src/config/index.test.ts), [src/main/voicenotes-client/index.test.ts](./src/main/voicenotes-client/index.test.ts)).

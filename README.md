@@ -73,7 +73,11 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (or the
 
 Restart Claude.
 
+For local development (`bun run server:mcp:dev`), copy [`.env.example`](./.env.example) to `.env.development` and fill in `MCP_VOICENOTES_EDIT_PAT`. `.env.*` files are gitignored; only the `.env.example` template is committed.
+
 ## Environment variables
+
+All variables are listed in [`.env.example`](./.env.example) with inline comments. Summary:
 
 | Variable                                  | Required | Default                                          | Purpose                                                                                                |
 | ----------------------------------------- | -------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |

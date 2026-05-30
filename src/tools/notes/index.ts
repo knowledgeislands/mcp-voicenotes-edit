@@ -1,8 +1,9 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
+import type { Config } from '../../config/index.js'
+import { patchRecording, summarizeRecording } from '../../main/voicenotes-client/index.js'
 import { WRITE_IDEMPOTENT_REMOTE } from '../../utils/annotations.js'
 import { errorResult, jsonResult } from '../../utils/results.js'
-import { patchRecording, summarizeRecording } from '../../voicenotes-client.js'
 
 const uuidArg = z
   .string()
@@ -38,7 +39,7 @@ const updateTitleInput = z
   })
   .strict()
 
-export const registerNotesTools = (server: McpServer): void => {
+export const registerNotesTools = (server: McpServer, cfg: Config): void => {
   server.registerTool(
     'voicenotes_note_update_tags',
     {
@@ -61,7 +62,7 @@ Errors:
     },
     async ({ uuid, tags }) => {
       try {
-        const updated = await patchRecording(uuid, { tags })
+        const updated = await patchRecording(cfg, uuid, { tags })
         return jsonResult(summarizeRecording(updated))
       } catch (err) {
         return errorResult('updating tags', err)
@@ -91,7 +92,7 @@ Errors:
     },
     async ({ uuid, title }) => {
       try {
-        const updated = await patchRecording(uuid, { title })
+        const updated = await patchRecording(cfg, uuid, { title })
         return jsonResult(summarizeRecording(updated))
       } catch (err) {
         return errorResult('updating title', err)

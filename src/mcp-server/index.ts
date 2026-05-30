@@ -28,22 +28,29 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
-import { ACCESS_LEVEL, AUDIT_LOG_MODE, AUDIT_LOG_PATH, VOICENOTES_BASE_URL } from '../config.js'
+import { loadConfig } from '../config/index.js'
 import { registerNotesTools } from '../tools/notes/index.js'
 import { makeAccessGatedRegister } from '../utils/access-level.js'
 
+const config = loadConfig()
+
 console.error(`mcp-voicenotes-edit starting...`)
-console.error(`  MCP_VOICENOTES_EDIT_BASE_URL=${VOICENOTES_BASE_URL}`)
-console.error(`  MCP_VOICENOTES_EDIT_ACCESS_LEVEL=${ACCESS_LEVEL}`)
-console.error(`  MCP_VOICENOTES_EDIT_AUDIT_LOG=${AUDIT_LOG_MODE}${AUDIT_LOG_MODE === 'off' ? '' : ` (path: ${AUDIT_LOG_PATH})`}`)
+console.error(`  MCP_VOICENOTES_EDIT_BASE_URL=${config.voicenotesBaseUrl}`)
+console.error(`  MCP_VOICENOTES_EDIT_ACCESS_LEVEL=${config.accessLevel}`)
+console.error(`  MCP_VOICENOTES_EDIT_AUDIT_LOG=${config.auditLogMode}${config.auditLogMode === 'off' ? '' : ` (path: ${config.auditLogPath})`}`)
 
 const server = new McpServer({
   name: 'mcp-voicenotes-edit',
   version: '0.1.0'
 })
-server.registerTool = makeAccessGatedRegister(server)
+server.registerTool = makeAccessGatedRegister(server, config.accessLevel, {
+  mode: config.auditLogMode,
+  path: config.auditLogPath,
+  maxBytes: config.auditLogMaxBytes,
+  keep: config.auditLogKeep
+})
 
-registerNotesTools(server)
+registerNotesTools(server, config)
 
 const main = async (): Promise<void> => {
   const transport = new StdioServerTransport()

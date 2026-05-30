@@ -22,8 +22,8 @@ In scope:
 
 - Any code path that could write the PAT to stdout, the MCP response, the audit log, or any other observable channel.
 - Input validation in `src/tools/notes/index.ts` — particularly the `uuid` regex (`^[A-Za-z0-9]{8}$`) and the bounded `tags` / `title` schemas.
-- URL construction in `src/voicenotes-client.ts` — the uuid is `encodeURIComponent`-wrapped as belt-and-braces, but a missing validation upstream that lets a non-conforming uuid reach the client is still a finding.
-- Boot-time validation in `src/config.ts` of `MCP_VOICENOTES_EDIT_PAT`.
+- URL construction in `src/main/voicenotes-client/index.ts` — the uuid is `encodeURIComponent`-wrapped as belt-and-braces, but a missing validation upstream that lets a non-conforming uuid reach the client is still a finding.
+- Boot-time validation of `MCP_VOICENOTES_EDIT_PAT` in `loadConfig()` (`src/config/index.ts`).
 
 Out of scope:
 

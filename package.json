@@ -29,6 +29,21 @@
   "engines": {
     "node": ">=22.0.0"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/mcp-server/index.d.ts",
+      "import": "./dist/mcp-server/index.js"
+    },
+    "./config": {
+      "types": "./dist/config/index.d.ts",
+      "import": "./dist/config/index.js"
+    },
+    "./voicenotes-client": {
+      "types": "./dist/main/voicenotes-client/index.d.ts",
+      "import": "./dist/main/voicenotes-client/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist"
   ],

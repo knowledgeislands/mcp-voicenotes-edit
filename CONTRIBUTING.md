@@ -34,9 +34,10 @@ You will need a Voicenotes personal access token in `MCP_VOICENOTES_EDIT_PAT` fo
 
 ### Code
 
-- **TypeScript ES modules** — `"type": "module"`, internal imports use `.js` extensions (e.g. `from './voicenotes-client.js'`) so `tsc` emits valid JS.
+- **TypeScript ES modules** — `"type": "module"`, internal imports use `.js` extensions (e.g. `from '../../main/voicenotes-client/index.js'`) so `tsc` emits valid JS.
 - **Arrow functions** for top-level declarations (`export const foo = () => …`).
-- **No bare `fetch`** in tool callbacks — go through `src/voicenotes-client.ts` so auth, encoding, and error translation stay centralised.
+- **Workspace MCP layout** — `src/config/index.ts` (`loadConfig(env?) → Config`, no module-level singleton), `src/mcp-server/` (stdio wrapper), `src/tools/` (thin tool defs), `src/main/<area>/index.ts` (implementation, takes `Config`/slice as its first arg, usable from a script), `src/utils/` (cross-MCP helpers taking the specific config primitive). Tests are co-located.
+- **No bare `fetch`** in tool callbacks — go through `src/main/voicenotes-client/index.ts` (`patchRecording(cfg, …)` / `getRecording(cfg, …)`) so auth, encoding, and error translation stay centralised.
 - **Input validation**: every uuid input carries the `^[A-Za-z0-9]{8}$` regex on the zod schema. Bounded tag arrays (≤ 64) and bounded title strings (≤ 500). New schemas must continue this.
 - **Errors**: tools return MCP errors via `errorResult(action, error)` — a short gerund action phrase (e.g. `'updating tags'`) plus the caught `error`, formatted as `Error <action>: <message>`. Structured results via `jsonResult(...)`. Never `throw` from a tool callback — the audit-log wrapper depends on the MCP `isError` envelope.
 - **Annotations**: be honest with `readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint` on every tool registration. Use a preset from [src/utils/annotations.ts](./src/utils/annotations.ts).

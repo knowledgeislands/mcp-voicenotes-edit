@@ -1,4 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { VoicenotesConfig } from './index.js'
+import { getRecording, patchRecording, summarizeRecording, VoicenotesApiError } from './index.js'
+
+// Config is injected, so tests pass an explicit slice — no env mutation / module reset.
+const cfg: VoicenotesConfig = { voicenotesPat: '1209|secret', voicenotesBaseUrl: 'https://api.voicenotes.test' }
 
 const sampleRecording = {
   data: {
@@ -20,22 +25,17 @@ describe('voicenotes-client (mcp-voicenotes-edit)', () => {
   let fetchMock: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    process.env.MCP_VOICENOTES_EDIT_PAT = '1209|secret'
-    process.env.MCP_VOICENOTES_EDIT_BASE_URL = 'https://api.voicenotes.test'
     fetchMock = vi.fn()
     vi.stubGlobal('fetch', fetchMock)
-    vi.resetModules()
   })
 
   afterEach(() => {
     vi.unstubAllGlobals()
-    delete process.env.MCP_VOICENOTES_EDIT_BASE_URL
   })
 
   it('getRecording issues GET with Bearer auth and returns the unwrapped data', async () => {
     fetchMock.mockResolvedValueOnce(new Response(JSON.stringify(sampleRecording), { status: 200 }))
-    const { getRecording } = await import('./voicenotes-client.js')
-    const result = await getRecording('YRjeZkMc')
+    const result = await getRecording(cfg, 'YRjeZkMc')
     expect(fetchMock).toHaveBeenCalledTimes(1)
     const [url, init] = fetchMock.mock.calls[0] ?? []
     expect(url).toBe('https://api.voicenotes.test/api/recordings/YRjeZkMc')
@@ -51,8 +51,7 @@ describe('voicenotes-client (mcp-voicenotes-edit)', () => {
   it('patchRecording issues PATCH with the JSON body', async () => {
     const updated = { ...sampleRecording, data: { ...sampleRecording.data, tags: [{ id: 99, name: 'processed', emoji: null, is_pinned: 0 }] } }
     fetchMock.mockResolvedValueOnce(new Response(JSON.stringify(updated), { status: 200 }))
-    const { patchRecording } = await import('./voicenotes-client.js')
-    const result = await patchRecording('YRjeZkMc', { tags: ['processed'] })
+    const result = await patchRecording(cfg, 'YRjeZkMc', { tags: ['processed'] })
     const [, init] = fetchMock.mock.calls[0] ?? []
     expect(init.method).toBe('PATCH')
     expect(JSON.parse(init.body)).toEqual({ tags: ['processed'] })
@@ -61,44 +60,38 @@ describe('voicenotes-client (mcp-voicenotes-edit)', () => {
 
   it('url-encodes the uuid segment', async () => {
     fetchMock.mockResolvedValueOnce(new Response(JSON.stringify(sampleRecording), { status: 200 }))
-    const { getRecording } = await import('./voicenotes-client.js')
     // The schema upstream forbids this, but the client should still be safe if it ever leaks through.
-    await getRecording('a b/c?')
+    await getRecording(cfg, 'a b/c?')
     const [url] = fetchMock.mock.calls[0] ?? []
     expect(url).toBe('https://api.voicenotes.test/api/recordings/a%20b%2Fc%3F')
   })
 
   it('unwraps responses that already lack a `data` envelope', async () => {
     fetchMock.mockResolvedValueOnce(new Response(JSON.stringify(sampleRecording.data), { status: 200 }))
-    const { getRecording } = await import('./voicenotes-client.js')
-    const result = await getRecording('YRjeZkMc')
+    const result = await getRecording(cfg, 'YRjeZkMc')
     expect(result.id).toBe('YRjeZkMc')
   })
 
   it('throws VoicenotesApiError with status + body on non-2xx', async () => {
     fetchMock.mockResolvedValueOnce(new Response('{"message":"not found"}', { status: 404 }))
-    const { getRecording, VoicenotesApiError } = await import('./voicenotes-client.js')
-    await expect(getRecording('aaaaaaaa')).rejects.toThrow(VoicenotesApiError)
+    await expect(getRecording(cfg, 'aaaaaaaa')).rejects.toThrow(VoicenotesApiError)
     fetchMock.mockResolvedValueOnce(new Response('{"message":"unauthorized"}', { status: 401 }))
-    const errPromise = getRecording('aaaaaaaa')
+    const errPromise = getRecording(cfg, 'aaaaaaaa')
     await expect(errPromise).rejects.toMatchObject({ status: 401, body: '{"message":"unauthorized"}' })
   })
 
   it('truncates long error bodies in the thrown message', async () => {
     const longBody = `${'x'.repeat(600)}END`
     fetchMock.mockResolvedValueOnce(new Response(longBody, { status: 500 }))
-    const { getRecording } = await import('./voicenotes-client.js')
-    await expect(getRecording('aaaaaaaa')).rejects.toThrow(/HTTP 500:.*…/)
+    await expect(getRecording(cfg, 'aaaaaaaa')).rejects.toThrow(/HTTP 500:.*…/)
   })
 
   it('throws VoicenotesApiError when the body is not valid JSON', async () => {
     fetchMock.mockResolvedValueOnce(new Response('not json at all', { status: 200 }))
-    const { getRecording } = await import('./voicenotes-client.js')
-    await expect(getRecording('aaaaaaaa')).rejects.toThrow(/non-JSON body/)
+    await expect(getRecording(cfg, 'aaaaaaaa')).rejects.toThrow(/non-JSON body/)
   })
 
-  it('summarizeRecording projects to id/title/tags/updated_at', async () => {
-    const { summarizeRecording } = await import('./voicenotes-client.js')
+  it('summarizeRecording projects to id/title/tags/updated_at', () => {
     const summary = summarizeRecording(sampleRecording.data)
     expect(summary).toEqual({
       id: 'YRjeZkMc',

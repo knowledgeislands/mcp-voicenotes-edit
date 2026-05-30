@@ -6,12 +6,9 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.test.ts'],
     fileParallelism: false,
-    env: {
-      // Bogus PAT so config.ts boot validation passes when tests instantiate
-      // the server entrypoint. Real-API tests live in `src/**/*.live.test.ts`
-      // and require MCP_VOICENOTES_EDIT_PAT_TEST to be set externally.
-      MCP_VOICENOTES_EDIT_PAT: 'test|placeholder'
-    },
+    // No env seeding needed: config is loaded explicitly via loadConfig() and
+    // passed into calls, so nothing reads process.env at import time. Tests
+    // build their own Config (or call loadConfig with an explicit env object).
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov', 'html'],

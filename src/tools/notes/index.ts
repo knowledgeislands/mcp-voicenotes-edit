@@ -1,7 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 import { WRITE_IDEMPOTENT_REMOTE } from '../../utils/annotations.js'
-import { errMessage } from '../../utils/errors.js'
 import { errorResult, jsonResult } from '../../utils/results.js'
 import { patchRecording, summarizeRecording } from '../../voicenotes-client.js'
 
@@ -65,7 +64,7 @@ Errors:
         const updated = await patchRecording(uuid, { tags })
         return jsonResult(summarizeRecording(updated))
       } catch (err) {
-        return errorResult(errMessage(err))
+        return errorResult('updating tags', err)
       }
     }
   )
@@ -95,7 +94,7 @@ Errors:
         const updated = await patchRecording(uuid, { title })
         return jsonResult(summarizeRecording(updated))
       } catch (err) {
-        return errorResult(errMessage(err))
+        return errorResult('updating title', err)
       }
     }
   )

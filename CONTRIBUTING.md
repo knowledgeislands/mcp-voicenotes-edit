@@ -38,7 +38,7 @@ You will need a Voicenotes personal access token in `MCP_VOICENOTES_EDIT_PAT` fo
 - **Arrow functions** for top-level declarations (`export const foo = () => …`).
 - **No bare `fetch`** in tool callbacks — go through `src/voicenotes-client.ts` so auth, encoding, and error translation stay centralised.
 - **Input validation**: every uuid input carries the `^[A-Za-z0-9]{8}$` regex on the zod schema. Bounded tag arrays (≤ 64) and bounded title strings (≤ 500). New schemas must continue this.
-- **Errors**: tools return MCP errors via `errorResult(...)`; structured results via `jsonResult(...)`. Never `throw` from a tool callback — the audit-log wrapper depends on the MCP `isError` envelope.
+- **Errors**: tools return MCP errors via `errorResult(action, error)` — a short gerund action phrase (e.g. `'updating tags'`) plus the caught `error`, formatted as `Error <action>: <message>`. Structured results via `jsonResult(...)`. Never `throw` from a tool callback — the audit-log wrapper depends on the MCP `isError` envelope.
 - **Annotations**: be honest with `readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint` on every tool registration. Use a preset from [src/utils/annotations.ts](./src/utils/annotations.ts).
 
 ### Commits

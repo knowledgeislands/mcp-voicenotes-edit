@@ -16,4 +16,3 @@ Forward-looking plans only. Shipped features live in [README.md](./README.md); r
 ## Tooling
 
 - Schema validation tests for `tools/notes` (zod input schemas). Test suites for `config.ts` env parsing and `voicenotes-client.ts` error translation have shipped (see [src/config.test.ts](./src/config.test.ts), [src/voicenotes-client.test.ts](./src/voicenotes-client.test.ts)).
-- Smoke test (`bun run test:smoke`) — boot the built server and verify the wire-level tool surface matches in-process registration. mcp-gmail has the reference implementation (`scripts/smoke.ts` + CI step); voicenotes-edit lacks both.

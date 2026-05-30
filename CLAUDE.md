@@ -48,7 +48,7 @@ The security boundary is the PAT in `MCP_VOICENOTES_EDIT_PAT`. New tools and cha
 3. **All requests go through `requestRecording()` in [src/voicenotes-client.ts](./src/voicenotes-client.ts).** `encodeURIComponent` on the uuid is belt-and-braces against future loosening of the regex; do not bypass.
 4. **Destructive tools require explicit confirmation.** When `voicenotes_note_delete` lands (see [ROADMAP.md](./ROADMAP.md)), it MUST carry the `DESTRUCTIVE_ONESHOT_REMOTE` annotation, expose a `dry_run: boolean` default `true`, and only call DELETE when explicitly disabled. The `destructive` access level must be opt-in.
 5. **Zod schemas are `.strict()` with bounded sizes.** Tag arrays cap at 64 entries; titles cap at 500 chars. Add bounds for every new field.
-6. **Errors return via `errorResult(...)`, not `throw`.** The audit-log wrapper depends on the MCP `isError` envelope to log failures correctly.
+6. **Errors return via `errorResult(action, error)`, not `throw`.** The audit-log wrapper depends on the MCP `isError` envelope to log failures correctly. `errorResult` takes a short gerund action phrase (e.g. `'updating tags'`) plus the caught `error`; it formats `Error <action>: <message>` and runs the value through `errMessage()` internally — callers pass the raw `error`, not `errMessage(err)`.
 
 ## Tool registration call sites
 

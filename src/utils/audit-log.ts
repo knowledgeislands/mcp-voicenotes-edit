@@ -65,7 +65,7 @@ const rotateIfNeeded = async (): Promise<void> => {
   }
 }
 
-export const appendAuditEvent = async (event: AuditEvent): Promise<void> => {
+const writeAuditEvent = async (event: AuditEvent): Promise<void> => {
   try {
     await fs.mkdir(path.dirname(AUDIT_LOG_PATH), { recursive: true })
     await fs.appendFile(AUDIT_LOG_PATH, `${JSON.stringify(event)}\n`, { encoding: 'utf-8', mode: 0o600 })
@@ -82,6 +82,17 @@ export const appendAuditEvent = async (event: AuditEvent): Promise<void> => {
     /* v8 ignore next — fs.* always rejects with an Error, so the String(err) fallback is unreachable in practice */
     console.error(`[audit-log] failed to write: ${err instanceof Error ? err.message : String(err)}`)
   }
+}
+
+// Serialize appends through a single chain so concurrent callers can't race on
+// the append → stat → rotate sequence (two simultaneous rotations would have
+// one `rename(live → .1)` lose with ENOENT). Each call awaits the prior one;
+// errors are swallowed inside writeAuditEvent so the chain never rejects.
+let auditQueue: Promise<void> = Promise.resolve()
+
+export const appendAuditEvent = (event: AuditEvent): Promise<void> => {
+  auditQueue = auditQueue.then(() => writeAuditEvent(event))
+  return auditQueue
 }
 
 type ToolCallback = (...callbackArgs: unknown[]) => unknown | Promise<unknown>

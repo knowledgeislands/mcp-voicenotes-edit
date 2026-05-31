@@ -51,6 +51,9 @@ export class VoicenotesApiError extends Error {
   }
 }
 
+/** Bound every Voicenotes call so a hung backend can't wedge the stdio server. */
+const REQUEST_TIMEOUT_MS = 30_000
+
 const headers = (cfg: VoicenotesConfig): Record<string, string> => ({
   Authorization: `Bearer ${cfg.voicenotesPat}`,
   Accept: 'application/json',
@@ -62,7 +65,9 @@ const requestRecording = async (cfg: VoicenotesConfig, method: 'GET' | 'PATCH', 
   const resp = await fetch(url, {
     method,
     headers: headers(cfg),
-    body: body === undefined ? undefined : JSON.stringify(body)
+    body: body === undefined ? undefined : JSON.stringify(body),
+    // A timeout abort rejects the fetch; the tool boundary maps it to errorResult.
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
   })
   const text = await resp.text()
   if (!resp.ok) {
